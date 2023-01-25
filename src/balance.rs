@@ -1,8 +1,6 @@
 use std::collections::VecDeque;
 use eframe::egui::plot::{PlotPoint, PlotPoints};
 
-
-
 pub enum Currency {
     USD,
     EUR,
@@ -27,19 +25,20 @@ impl BalanceMeasurements {
         }
     }
 
-    pub fn append_values_usd(&mut self, v: PlotPoint) {
-        self.usd.push_back(v);
-    }
-    pub fn append_values_eur(&mut self, v: PlotPoint) {
-        self.eur.push_back(v);
-    }
-    pub fn append_values_yen(&mut self, v: PlotPoint) {
-        self.yen.push_back(v);
-    }
-    pub fn append_values_yuan(&mut self, v: PlotPoint) {
-        self.yuan.push_back(v);
-    }
 
+    //Not used yet
+    // pub fn append_values_usd(&mut self, v: PlotPoint) {
+    //     self.usd.push_back(v);
+    // }
+    // pub fn append_values_eur(&mut self, v: PlotPoint) {
+    //     self.eur.push_back(v);
+    // }
+    // pub fn append_values_yen(&mut self, v: PlotPoint) {
+    //     self.yen.push_back(v);
+    // }
+    // pub fn append_values_yuan(&mut self, v: PlotPoint) {
+    //     self.yuan.push_back(v);
+    // }
 
     pub fn plot_values_usd(&self) -> PlotPoints {
         PlotPoints::Owned(Vec::from_iter(self.usd.iter().copied()))

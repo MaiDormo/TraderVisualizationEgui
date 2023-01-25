@@ -1,21 +1,70 @@
 use std::ops::RangeInclusive;
 use std::sync::{Arc, Mutex};
-use eframe::egui::{Color32, Response, Ui};
+use eframe::egui::{Color32, Response, Ui, Vec2};
 use eframe::egui::plot::{CoordinatesFormatter, Corner, Legend, Line, Plot};
+use eframe::{egui, HardwareAcceleration, Theme};
 use crate::balance::BalanceMeasurements;
-use crate::Panel;
+use crate::panel::Panel;
 
 #[derive(Default)]
 pub struct App {
     pub balance_measurements: Arc<Mutex<BalanceMeasurements>>,
-    open_panel: Panel
+    open_panel: Panel,
+    pub options: eframe::NativeOptions
+}
+
+impl eframe::App for App {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            //code for the custom x axis
+            self.ui(ui);
+        });
+
+        // needed in order to request repaint
+        // ctx.request_repaint();
+
+        ctx.request_repaint_after(std::time::Duration::from_secs_f32(
+            1.0,
+        ));
+    }
+
+    fn name(&self) -> &str {
+        "Trader Balance"
+    }
 }
 
 impl App {
     pub fn new() -> Self {
         Self {
             balance_measurements: Arc::new(Mutex::new(BalanceMeasurements::new())),
-            open_panel: Default::default()
+            open_panel: Default::default(),
+            options : eframe::NativeOptions {
+                always_on_top: false,
+                maximized: false,
+                decorated: true,
+                fullscreen: false,
+                drag_and_drop_support: true,
+                icon_data: None,
+                initial_window_pos: None,
+                initial_window_size: Option::from(Vec2::new(950.0 as f32, 750.0 as f32)),
+                min_window_size: Option::from(Vec2::new(950.0,750.0)),
+                max_window_size: None,
+                resizable: false,
+                transparent: false,
+                mouse_passthrough: false,
+                vsync: true,
+                multisampling: 0,
+                depth_buffer: 0,
+                stencil_buffer: 0,
+                hardware_acceleration: HardwareAcceleration::Required,
+                renderer: Default::default(),
+                follow_system_theme: false,
+                default_theme: Theme::Dark,
+                run_and_return: false,
+                event_loop_builder: None,
+                shader_version: None,
+                centered: false,
+            }
         }
     }
 
@@ -147,3 +196,4 @@ impl App {
             .response
     }
 }
+
