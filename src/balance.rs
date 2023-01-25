@@ -1,12 +1,6 @@
 use std::collections::VecDeque;
 use eframe::egui::plot::{PlotPoint, PlotPoints};
-use std::thread;
 
-
-//try
-use std::fs::File;
-use std::io::{self, BufRead, BufReader, Lines};
-use std::path::Path;
 
 
 pub enum Currency {
