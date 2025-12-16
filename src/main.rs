@@ -1,17 +1,23 @@
-mod balance;
 mod app;
+mod balance;
 mod panel;
 
+use crate::app::App;
+use crate::balance::Currency;
+use eframe::egui::plot::PlotPoint;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::{thread, time};
-use eframe::egui::plot::{PlotPoint};
 use tracing::{error, info, warn};
-use crate::app::App;
-use crate::balance::Currency;
-
 
 fn main() {
+    // Force winit to use X11 on Unix before winit/eframe/winit initialize.
+    // This can avoid freetype/crossfont panics on some Wayland setups.
+    #[cfg(target_os = "linux")]
+    {
+        std::env::set_var("WINIT_UNIX_BACKEND", "x11");
+    }
+
     let app = App::new();
     let options = eframe::NativeOptions::from(app.options.clone());
 
@@ -21,7 +27,7 @@ fn main() {
 
     thread::spawn(move || {
         //iterate strategy for etc...
-            //inside il for si aggiunge values
+        //inside il for si aggiunge values
         let file = File::open(path).expect("file not found");
         let lines_iter = BufReader::new(file).lines();
         for line in lines_iter {
@@ -37,7 +43,6 @@ fn main() {
                     let eur_str = parts.get(1).unwrap();
                     let yen_str = parts.get(2).unwrap();
                     let yuan_str = parts.get(3).unwrap();
-
 
                     let usd = match usd_str.parse::<f64>() {
                         Ok(value) => value,
@@ -75,27 +80,26 @@ fn main() {
                     monitor_ref
                         .lock()
                         .unwrap()
-                        .add(PlotPoint::new(current_day,usd), Currency::USD);
+                        .add(PlotPoint::new(current_day, usd), Currency::USD);
                     monitor_ref
                         .lock()
                         .unwrap()
-                        .add(PlotPoint::new(current_day,eur), Currency::EUR);
+                        .add(PlotPoint::new(current_day, eur), Currency::EUR);
                     monitor_ref
                         .lock()
                         .unwrap()
-                        .add(PlotPoint::new(current_day,yen), Currency::YEN);
+                        .add(PlotPoint::new(current_day, yen), Currency::YEN);
                     monitor_ref
                         .lock()
                         .unwrap()
-                        .add(PlotPoint::new(current_day,yuan), Currency::YUAN);
+                        .add(PlotPoint::new(current_day, yuan), Currency::YUAN);
 
                     //update current day
-                    current_day+=1;
+                    current_day += 1;
 
                     //sleep the thread so it can happen in a more visual manner
                     thread::sleep(time::Duration::from_secs(1));
-
-                },
+                }
                 _ => {
                     error!("Failed to read the line");
                     break;
@@ -105,10 +109,5 @@ fn main() {
     });
 
     info!("Main thread started");
-    eframe::run_native(
-        " Trader ",
-        options,
-        Box::new(|_cc| Box::new(app)),
-    )
-
+    eframe::run_native(" Trader ", options, Box::new(|_cc| Box::new(app)))
 }

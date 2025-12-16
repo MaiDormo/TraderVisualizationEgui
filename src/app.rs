@@ -1,16 +1,16 @@
-use std::ops::RangeInclusive;
-use std::sync::{Arc, Mutex};
-use eframe::egui::{Color32, Response, Ui, Vec2};
-use eframe::egui::plot::{CoordinatesFormatter, Corner, Legend, Line, Plot};
-use eframe::{egui, HardwareAcceleration, Theme};
 use crate::balance::BalanceMeasurements;
 use crate::panel::Panel;
+use eframe::egui::plot::{CoordinatesFormatter, Corner, Legend, Line, Plot};
+use eframe::egui::{Color32, Response, Ui, Vec2};
+use eframe::{egui, HardwareAcceleration, Theme};
+use std::ops::RangeInclusive;
+use std::sync::{Arc, Mutex};
 
 #[derive(Default)]
 pub struct App {
     pub balance_measurements: Arc<Mutex<BalanceMeasurements>>,
     open_panel: Panel,
-    pub options: eframe::NativeOptions
+    pub options: eframe::NativeOptions,
 }
 
 impl eframe::App for App {
@@ -23,13 +23,7 @@ impl eframe::App for App {
         // needed in order to request repaint
         // ctx.request_repaint();
 
-        ctx.request_repaint_after(std::time::Duration::from_secs_f32(
-            1.0,
-        ));
-    }
-
-    fn name(&self) -> &str {
-        "Trader Balance"
+        ctx.request_repaint_after(std::time::Duration::from_secs_f32(1.0));
     }
 }
 
@@ -38,7 +32,7 @@ impl App {
         Self {
             balance_measurements: Arc::new(Mutex::new(BalanceMeasurements::new())),
             open_panel: Default::default(),
-            options : eframe::NativeOptions {
+            options: eframe::NativeOptions {
                 always_on_top: false,
                 maximized: false,
                 decorated: true,
@@ -47,7 +41,7 @@ impl App {
                 icon_data: None,
                 initial_window_pos: None,
                 initial_window_size: Option::from(Vec2::new(950.0 as f32, 750.0 as f32)),
-                min_window_size: Option::from(Vec2::new(950.0,750.0)),
+                min_window_size: Option::from(Vec2::new(950.0, 750.0)),
                 max_window_size: None,
                 resizable: false,
                 transparent: false,
@@ -64,7 +58,7 @@ impl App {
                 event_loop_builder: None,
                 shader_version: None,
                 centered: false,
-            }
+            },
         }
     }
 
@@ -81,8 +75,12 @@ impl App {
                     ui.label("Zoom with ctrl + scroll.");
                 }
                 ui.label("Reset view with double-click.");
-                ui.label("Merge: Gives the options to see the balance of all the current currencies");
-                ui.label("Divide: Gives the options to see the individual balance for all currencies");
+                ui.label(
+                    "Merge: Gives the options to see the balance of all the current currencies",
+                );
+                ui.label(
+                    "Divide: Gives the options to see the individual balance for all currencies",
+                );
             });
             ui.separator();
             ui.horizontal(|ui| {
@@ -91,15 +89,14 @@ impl App {
             });
             ui.separator();
 
-
             //fixed color for all currency
-            let usd_color = Color32::from_rgb(51,255,51);
-            let eur_color = Color32::from_rgb(51,51,255);
-            let yen_color = Color32::from_rgb(255,51,51);
-            let yuan_color = Color32::from_rgb(255,255,51);
+            let usd_color = Color32::from_rgb(51, 255, 51);
+            let eur_color = Color32::from_rgb(51, 51, 255);
+            let yen_color = Color32::from_rgb(255, 51, 51);
+            let yuan_color = Color32::from_rgb(255, 255, 51);
 
             //format the x Axis
-            let x_fmt = |x:f64, _range: &RangeInclusive<f64>| {
+            let x_fmt = |x: f64, _range: &RangeInclusive<f64>| {
                 // Days
                 format!("Day {}", x)
             };
@@ -111,23 +108,35 @@ impl App {
                     plot
                         //to add a Legend
                         .legend(Legend::default())
-
                         //to custom format the axis
                         .x_axis_formatter(x_fmt)
-
                         //to add a coordinate show box in the right bottom of the screen
                         .coordinates_formatter(Corner::RightBottom, CoordinatesFormatter::default())
-
                         //to show the UI
-                        .show(ui,|plot_ui| {
-                            let usd = Line::new(self.balance_measurements.lock().unwrap().plot_values_usd());
-                            let eur = Line::new(self.balance_measurements.lock().unwrap().plot_values_eur());
-                            let yen = Line::new(self.balance_measurements.lock().unwrap().plot_values_yen());
-                            let yuan = Line::new(self.balance_measurements.lock().unwrap().plot_values_yuan());
-                            plot_ui.line(usd.width(3.0).color(Color32::from(usd_color)).name("USD"));
-                            plot_ui.line(eur.width(3.0).color(Color32::from(eur_color)).name("EUR"));
-                            plot_ui.line(yen.width(3.0).color(Color32::from(yen_color)).name("YEN"));
-                            plot_ui.line(yuan.width(3.0).color(Color32::from(yuan_color)).name("YUAN"));
+                        .show(ui, |plot_ui| {
+                            let usd = Line::new(
+                                self.balance_measurements.lock().unwrap().plot_values_usd(),
+                            );
+                            let eur = Line::new(
+                                self.balance_measurements.lock().unwrap().plot_values_eur(),
+                            );
+                            let yen = Line::new(
+                                self.balance_measurements.lock().unwrap().plot_values_yen(),
+                            );
+                            let yuan = Line::new(
+                                self.balance_measurements.lock().unwrap().plot_values_yuan(),
+                            );
+                            plot_ui
+                                .line(usd.width(3.0).color(Color32::from(usd_color)).name("USD"));
+                            plot_ui
+                                .line(eur.width(3.0).color(Color32::from(eur_color)).name("EUR"));
+                            plot_ui
+                                .line(yen.width(3.0).color(Color32::from(yen_color)).name("YEN"));
+                            plot_ui.line(
+                                yuan.width(3.0)
+                                    .color(Color32::from(yuan_color))
+                                    .name("YUAN"),
+                            );
                         })
                 }
                 Panel::Divided => {
@@ -143,11 +152,17 @@ impl App {
                             .height(150.0)
                             .legend(Legend::default())
                             .x_axis_formatter(x_fmt)
-                            .coordinates_formatter(Corner::RightBottom, CoordinatesFormatter::default())
+                            .coordinates_formatter(
+                                Corner::RightBottom,
+                                CoordinatesFormatter::default(),
+                            )
                             .show(ui, |plot_ui| {
-                                let usd = Line::new(self.balance_measurements.lock().unwrap().plot_values_usd());
+                                let usd = Line::new(
+                                    self.balance_measurements.lock().unwrap().plot_values_usd(),
+                                );
                                 plot_ui.line(
-                                    usd.width(3.0).color(Color32::from(usd_color)).name("USD"));
+                                    usd.width(3.0).color(Color32::from(usd_color)).name("USD"),
+                                );
                             });
 
                         ui.separator();
@@ -157,10 +172,17 @@ impl App {
                             .height(150.0)
                             .legend(Legend::default())
                             .x_axis_formatter(x_fmt)
-                            .coordinates_formatter(Corner::RightBottom, CoordinatesFormatter::default())
+                            .coordinates_formatter(
+                                Corner::RightBottom,
+                                CoordinatesFormatter::default(),
+                            )
                             .show(ui, |plot_ui| {
-                                let usd = Line::new(self.balance_measurements.lock().unwrap().plot_values_eur());
-                                plot_ui.line(usd.width(3.0).color(Color32::from(eur_color)).name("EUR"));
+                                let usd = Line::new(
+                                    self.balance_measurements.lock().unwrap().plot_values_eur(),
+                                );
+                                plot_ui.line(
+                                    usd.width(3.0).color(Color32::from(eur_color)).name("EUR"),
+                                );
                             });
 
                         ui.separator();
@@ -170,10 +192,17 @@ impl App {
                             .height(150.0)
                             .legend(Legend::default())
                             .x_axis_formatter(x_fmt)
-                            .coordinates_formatter(Corner::RightBottom, CoordinatesFormatter::default())
+                            .coordinates_formatter(
+                                Corner::RightBottom,
+                                CoordinatesFormatter::default(),
+                            )
                             .show(ui, |plot_ui| {
-                                let usd = Line::new(self.balance_measurements.lock().unwrap().plot_values_yen());
-                                plot_ui.line(usd.width(3.0).color(Color32::from(yen_color)).name("YEN"));
+                                let usd = Line::new(
+                                    self.balance_measurements.lock().unwrap().plot_values_yen(),
+                                );
+                                plot_ui.line(
+                                    usd.width(3.0).color(Color32::from(yen_color)).name("YEN"),
+                                );
                             });
 
                         ui.separator();
@@ -183,17 +212,22 @@ impl App {
                             .height(150.0)
                             .legend(Legend::default())
                             .x_axis_formatter(x_fmt)
-                            .coordinates_formatter(Corner::RightBottom, CoordinatesFormatter::default())
+                            .coordinates_formatter(
+                                Corner::RightBottom,
+                                CoordinatesFormatter::default(),
+                            )
                             .show(ui, |plot_ui| {
-                                let usd = Line::new(self.balance_measurements.lock().unwrap().plot_values_yuan());
-                                plot_ui.line(usd.width(3.0).color(Color32::from(yuan_color)).name("YUAN"));
+                                let usd = Line::new(
+                                    self.balance_measurements.lock().unwrap().plot_values_yuan(),
+                                );
+                                plot_ui.line(
+                                    usd.width(3.0).color(Color32::from(yuan_color)).name("YUAN"),
+                                );
                             });
                     })
-
                 }
             }
         })
-            .response
+        .response
     }
 }
-
